@@ -4,14 +4,13 @@ from typing import List, Optional
 import backoff
 from nicoclient.model.playlist import Playlist
 from nicoclient.model.video import Video
-
-from sqlalchemy import create_engine, select, update
+from sqlalchemy import create_engine, select
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import Session, query
+from sqlalchemy.orm import Session
 
 from nicomirror.db import Database
-from nicomirror.db.impl.postgres.shared import Base
 from nicomirror.db.impl.postgres.dto import PlaylistDto, UploaderDto, VideoDto
+from nicomirror.db.impl.postgres.shared import Base
 from nicomirror.db.impl.postgres.util import convert, get_upsert_statement
 
 logger = logging.getLogger("nicomirror")
@@ -32,25 +31,27 @@ class PostgresDatabase(Database):
         with Session(self.engine) as session:
             # Upsert users
             uploader_dto = UploaderDto(id=playlist.owner_id)
-            stmt = get_upsert_statement([uploader_dto])
-            session.execute(stmt)
+            session.execute(get_upsert_statement([uploader_dto]).on_conflict_do_nothing())
 
             # Upsert playlist
             playlist_dto = convert(playlist, to=PlaylistDto, override=dict(videos=[]))
-            stmt = get_upsert_statement([playlist_dto])  # TODO: on conflict update
-            session.execute(stmt)
+            session.execute(get_upsert_statement([playlist_dto]).on_conflict_do_nothing())  # TODO: nice-to-have on conflict update
 
-            stmt = select(PlaylistDto).filter_by(id=playlist.id)
-            playlist_dto = session.scalar(stmt)
-            playlist_dto.videos = [convert(v, to=VideoDto) for v in playlist.videos]
+            # Associate videos to playlist
+            playlist_dto = session.scalar(select(PlaylistDto).filter_by(id=playlist.id))
+            for video in playlist.videos:
+                video_dto = session.scalar(select(VideoDto).filter_by(id=video.id))
+                if not video_dto:
+                    # Create a new VideoDto if not in DB
+                    video_dto = convert(video, to=VideoDto)
+                playlist_dto.videos.append(video_dto)
 
             session.commit()
 
     def save_videos(self, videos: List[Video]):
         videos_dto = [convert(video, to=VideoDto) for video in videos]
         with Session(self.engine) as session:
-            stmt = get_upsert_statement(videos_dto)
-            session.execute(stmt)
+            session.execute(get_upsert_statement(videos_dto).on_conflict_do_nothing())
             session.commit()
 
     def get_video_by_id(self, video_id: str) -> Optional[Video]:
