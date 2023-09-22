@@ -33,8 +33,8 @@ def root():
 
 
 @app.get("/videos/{video_id}", response_model=Video)
-def get_video_by_id(video_id):
-    return mirror.get_video_by_id(video_id)
+def get_video_by_id(video_id, force_fetch: bool = False):
+    return mirror.get_video_by_id(video_id, force_fetch=force_fetch)
 
 
 @app.get("/videos/{video_id}/utattemita")
