@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=nicomirror
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=changeme
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./mnt/postgres-data:/var/lib/postgres/data
+      - ./mnt/postgres-init:/docker-entrypoint-initdb.d:ro
+  server:
+    image: nicomirror-server:latest
+    build:
+      context: server
+    command: uvicorn main:app --reload --host 0.0.0.0
+    volumes:
+      - ./server:/app/nicomirror
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+  # downloader:
+  #   depends_on:
+  #   - wireguard
+  #   network_mode: service:wireguard
+  # wireguard:
+  # nginx:
+  # ui:

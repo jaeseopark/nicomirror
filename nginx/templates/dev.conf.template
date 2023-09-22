@@ -1,0 +1,29 @@
+upstream ui {
+    server ui;
+}
+
+upstream api {
+    server api;
+}
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://ui;
+    }
+
+    location /api/ {
+        rewrite /api/(.*) /$1 break;
+        proxy_pass http://api;
+
+        proxy_read_timeout 300;
+        proxy_connect_timeout 300;
+        proxy_send_timeout 300;
+    }
+
+    location ~* \.(mp4|m4a)$ {
+        TODO: access the files
+        rewrite ^(.*)\.(mp4|m4a)$ $1.dec last;
+    }
+}

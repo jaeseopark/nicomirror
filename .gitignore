@@ -1,0 +1,5 @@
+tmp/
+.idea/
+*.pyc
+postgres-data/
+.DS_Store
