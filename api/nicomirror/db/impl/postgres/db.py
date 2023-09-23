@@ -30,6 +30,43 @@ class PostgresDatabase(Database):
 
         init_with_retry()
 
+    def get_video_by_id(self, video_id: str) -> Optional[Video]:
+        with Session(self.engine) as session:
+            video_dto = session.scalar(select(VideoDto).filter_by(id=video_id))
+            if video_dto:
+                return convert(video_dto, to=Video)
+
+    def get_playlist_by_id(self, playlist_id) -> Optional[Playlist]:
+        with Session(self.engine) as session:
+            playlist_dto = session.scalar(select(PlaylistDto).filter_by(id=playlist_id))
+
+            if playlist_dto:
+                videos = [convert(v, to=Video, override=dict(playlists=[])) for v in playlist_dto.videos]
+                return convert(playlist_dto, to=Playlist, override=dict(videos=videos))
+
+    def get_uploader_by_id(self, uploader_id: str):
+        with Session(self.engine) as session:
+            return session.scalar(select(UploaderDto).filter_by(id=uploader_id))
+
+    def get_recent_videos(self, limit: int):
+        with Session(self.engine) as session:
+            result = session.scalars(select(VideoDto).order_by(VideoDto.timestamp.desc()).limit(limit))
+            return [convert(video, to=Video) for video in result]
+
+    def save_uploader(self, uploader: Uploader):
+        with Session(self.engine) as session:
+            session.execute(get_upsert_statement(convert(uploader, to=UploaderDto, override=dict(names=[]))).on_conflict_do_nothing())
+            uploader_dto = session.scalar(select(UploaderDto).filter_by(id=uploader.id))
+
+            uploader_dto.names.clear()
+            for name in uploader.names:
+                name_dto = session.scalar(select(UploaderNameDto).filter_by(uploader_id=uploader.id, name=name))
+                if not name_dto:
+                    name_dto = UploaderNameDto(uploader_id=uploader.id, name=name)
+                uploader_dto.names.append(name_dto)
+
+            session.commit()
+
     def save_playlist(self, playlist: Playlist):
         with Session(self.engine) as session:
             # Upsert users
@@ -61,38 +98,6 @@ class PostgresDatabase(Database):
         with Session(self.engine) as session:
             session.execute(get_upsert_statement(videos_dto).on_conflict_do_nothing())
             session.commit()
-
-    def get_video_by_id(self, video_id: str) -> Optional[Video]:
-        with Session(self.engine) as session:
-            video_dto = session.scalar(select(VideoDto).filter_by(id=video_id))
-            if video_dto:
-                return convert(video_dto, to=Video)
-
-    def get_playlist_by_id(self, playlist_id) -> Optional[Playlist]:
-        with Session(self.engine) as session:
-            playlist_dto = session.scalar(select(PlaylistDto).filter_by(id=playlist_id))
-
-            if playlist_dto:
-                videos = [convert(v, to=Video, override=dict(playlists=[])) for v in playlist_dto.videos]
-                return convert(playlist_dto, to=Playlist, override=dict(videos=videos))
-
-    def save_uploader(self, uploader: Uploader):
-        with Session(self.engine) as session:
-            session.execute(get_upsert_statement(convert(uploader, to=UploaderDto, override=dict(names=[]))).on_conflict_do_nothing())
-            uploader_dto = session.scalar(select(UploaderDto).filter_by(id=uploader.id))
-
-            uploader_dto.names.clear()
-            for name in uploader.names:
-                name_dto = session.scalar(select(UploaderNameDto).filter_by(uploader_id=uploader.id, name=name))
-                if not name_dto:
-                    name_dto = UploaderNameDto(uploader_id=uploader.id, name=name)
-                uploader_dto.names.append(name_dto)
-
-            session.commit()
-
-    def get_uploader_by_id(self, uploader_id: str):
-        with Session(self.engine) as session:
-            return session.scalar(select(UploaderDto).filter_by(id=uploader_id))
 
     def link_video_to_uploader(self, video_id: str, uploader_id: str):
         with Session(self.engine) as session:

@@ -1,10 +1,13 @@
 services:
   gateway:
-    image: nginx:1.24
+    image: nginx:1.24-alpine
     volumes:
       - ./nginx/templates/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
-      - "23792:80"
+      - "80:80"
+    depends_on:
+      - ui
+      - api
   db:
     image: postgres:15
     environment:
@@ -26,7 +29,17 @@ services:
       - ./api:/app/nicomirror
     depends_on:
       - db
-  # ui:
+  ui:
+    image: node:18
+    working_dir: /app
+    command: sh -c "yarn install && yarn start-port80"
+    volumes:
+      - ./ui/public:/app/public
+      - ./ui/src:/app/src
+      - ./ui/package.json:/app/package.json
+      - ./ui/tsconfig.json:/app/tsconfig.json
+      - ./ui/yarn.lock:/app/yarn.lock
+      - ./ui/.prettierrc.js:/app/.prettierrc.js
   # downloader:
   #   depends_on:
   #   - wireguard

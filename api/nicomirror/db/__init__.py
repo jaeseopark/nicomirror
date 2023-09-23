@@ -45,3 +45,7 @@ class Database(ABC):
         :return: None
         """
         pass
+
+    @abstractmethod
+    def get_recent_videos(self, limit: int):
+        pass

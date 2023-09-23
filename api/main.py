@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 
@@ -25,11 +27,10 @@ def unicorn_exception_handler(*args, **kwargs):
     )
 
 
-@app.get("/")
-def root():
-    return dict(
-        trending_videos=mirror.get_trending_videos()
-    )
+@app.get("/videos")
+def get_recent_videos(limit: int = 50):
+    videos = mirror.get_recent_videos(limit=limit)
+    return dict(videos=videos)
 
 
 @app.get("/videos/{video_id}", response_model=Video)
