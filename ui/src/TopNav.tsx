@@ -1,14 +1,14 @@
-import react from "react";
 import "./TopNav.scss";
 import Search from "./Search";
+import { useNav } from "./hooks/useNav";
 
 const TopNav = () => {
-  // TODO: replace text with icons
+  const { navRoot, navDownloads } = useNav();
   return (
     <div className="nav">
-      <label>Home</label>
-      <label>Downloads</label>
+      <label onClick={navRoot}>Home</label>
       <Search />
+      <label onClick={navDownloads}>Downloads</label>
     </div>
   );
 };

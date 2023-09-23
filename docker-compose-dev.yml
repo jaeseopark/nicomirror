@@ -1,10 +1,11 @@
+version: "3"
 services:
   gateway:
     image: nginx:1.24-alpine
     volumes:
-      - ./nginx/templates/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./mnt/nginx/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
-      - "80:80"
+      - "2833:80"
     depends_on:
       - ui
       - api

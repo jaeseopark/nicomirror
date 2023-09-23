@@ -1,3 +1,3 @@
-const VideoView = ({ videoId }: { videoId: string }) => <div>Video View videoId={videoId}</div>;
+const VideoView = ({ videoId }: { videoId: string }): JSX.Element => <div>Video View videoId={videoId}</div>;
 
 export default VideoView;

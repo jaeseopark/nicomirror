@@ -3,11 +3,11 @@ import TopNav from "./TopNav";
 import { ReactNode } from "react";
 import { ChakraProvider } from "@chakra-ui/react";
 
-const App = ({ children }: { children: ReactNode }) => {
+const App = ({ children }: { children?: ReactNode }) => {
   return (
     <ChakraProvider>
       <div className="App">
-        <TopNav /> 
+        <TopNav />
         <div className="content">{children}</div>
       </div>
     </ChakraProvider>
