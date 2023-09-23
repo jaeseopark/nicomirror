@@ -23,6 +23,13 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
+## Code Formatting (Typescript)
+
+```bash
+npx prettier --write .
+docker-compose -f docker-compose-dev.yml exec ui npx prettier --write .
+```
+
 ## Swagger
 
 http://localhost:8000/docs

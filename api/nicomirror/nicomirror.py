@@ -22,6 +22,9 @@ class NicoMirror:
     def get_trending_videos(self) -> List[Video]:
         raise NotImplementedError
 
+    def get_recent_videos(self, limit:int):
+        return self.db.get_recent_videos(limit=limit)
+
     def get_video_by_id(self, video_id: str, force_fetch=False) -> Video:
         # TODO use regex for ID validation
         assert video_id.startswith("sm") or video_id.startswith("nm"), "video_id must start with 'sm' or 'nm'."

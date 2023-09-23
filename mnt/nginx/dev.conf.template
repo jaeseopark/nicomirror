@@ -23,7 +23,7 @@ server {
     }
 
     location ~* \.(mp4|m4a)$ {
-        TODO: access the files
+        # TODO: access the files
         rewrite ^(.*)\.(mp4|m4a)$ $1.dec last;
     }
 }

@@ -10,7 +10,7 @@ from nicomirror.db.impl.postgres.shared import Base
 logger = logging.getLogger("nicomirror")
 
 
-def convert(source_object, to: type, override: dict = None):  # convert to and from DTO
+def convert(source_object, to: type, override: dict = None):  # convert to and from DTO/BaseModel
     def get_allowed_keys():
         if issubclass(to, Base):
             return {k for k, v in vars(to).items() if isinstance(v, InstrumentedAttribute)}
