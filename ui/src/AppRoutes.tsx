@@ -1,10 +1,11 @@
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
+
 import App from "./App";
-import Home from "./Home";
-import VideoView from "./VideoView";
-import PlaylistView from "./PlaylistView";
 import DownloadsView from "./DownloadsView";
+import Home from "./Home";
+import PlaylistView from "./PlaylistView";
 import VideoListView from "./VideoListView";
+import VideoView from "./VideoView";
 import { useCache } from "./hooks/useCache";
 
 const withTopNav = (InnerComponent: (props: any) => JSX.Element) => (props: any) => (
@@ -17,7 +18,8 @@ const HomeWithNav = withTopNav(Home);
 const DownloadsWithNav = withTopNav(DownloadsView);
 const VideoWithNav = withTopNav(VideoView);
 const PlaylistWithNav = withTopNav(PlaylistView);
-const SearchWithNav = withTopNav(VideoListView);
+const VideoListWithNav = withTopNav(VideoListView);
+const LoadingWithNav = withTopNav(() => <div>Loading...</div>); // TODO: splash screen
 
 const ParameterizedVideoView = () => {
   const params = useParams();
@@ -34,7 +36,11 @@ const ParameterizedSearchView = () => {
   const { getVideosBySearchId } = useCache();
   const videos = getVideosBySearchId(params.searchId || "");
 
-  return <SearchWithNav videos={videos} />;
+  if (!videos) {
+    return <LoadingWithNav />;
+  }
+
+  return <VideoListWithNav videos={videos} />;
 };
 
 const AppRoutes = () => (

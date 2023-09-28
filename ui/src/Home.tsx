@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import VideoListView from "./VideoListView";
 import { getRecentVideos } from "./api";
 
 const Home = () => {
@@ -8,11 +10,11 @@ const Home = () => {
     getRecentVideos().then(setVideos);
   }, []);
 
-  {
-    videos.map((video: any) => <div>{video.id}</div>);
-  }
-
-  return <div>Home</div>;
+  return (
+    <div>
+      <VideoListView videos={videos} />
+    </div>
+  );
 };
 
 export default Home;

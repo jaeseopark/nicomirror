@@ -1,18 +1,19 @@
-import { useState, useEffect, useRef, forwardRef, useMemo } from "react";
+import { Search2Icon } from "@chakra-ui/icons";
 import {
   Input,
   InputGroup,
   InputLeftElement,
   Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverBody,
   PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Search2Icon } from "@chakra-ui/icons";
+import { Link as ChakraLink } from "@chakra-ui/react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { Link as ReactRouterLink } from "react-router-dom";
 
-import { useNav } from "./hooks/useNav";
 import { Classification, classifySearchTerm } from "./utils/regex";
 
 const SearchInputGroup = forwardRef(({ input, onChange }: { input: string; onChange: (newInput: string) => void }, ref: any) => (
@@ -31,21 +32,20 @@ const SearchInputGroup = forwardRef(({ input, onChange }: { input: string; onCha
 
 const SearchResultsView = ({ input }: { input: string }): JSX.Element => {
   const classification: Classification = useMemo(() => classifySearchTerm(input), [input]);
-  const { navVideo, navPlaylist } = useNav();
 
   if (classification.type === "video") {
     return (
-      <div>
-        <label onClick={() => navVideo(classification.sanitized)}>{classification.sanitized}</label>
-      </div>
+      <ChakraLink as={ReactRouterLink} to={`/videos/${classification.sanitized}`}>
+        Video: {classification.sanitized}
+      </ChakraLink>
     );
   }
 
   if (classification.type === "playlist") {
     return (
-      <div>
-        <label onClick={() => navPlaylist(classification.sanitized)}>{classification.sanitized}</label>
-      </div>
+      <ChakraLink as={ReactRouterLink} to={`/playlists/${classification.sanitized}`}>
+        Playlist: {classification.sanitized}
+      </ChakraLink>
     );
   }
 

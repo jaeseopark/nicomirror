@@ -49,3 +49,7 @@ class Database(ABC):
     @abstractmethod
     def get_recent_videos(self, limit: int):
         pass
+
+    @abstractmethod
+    def assign_parent(self, video_id: str, parent_video_id: str):
+        pass

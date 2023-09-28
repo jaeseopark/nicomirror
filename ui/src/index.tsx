@@ -1,16 +1,24 @@
+import { ChakraProvider } from "@chakra-ui/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
+
 import AppRoutes from "./AppRoutes";
+import { CacheProvider } from "./hooks/useCache";
+import reportWebVitals from "./reportWebVitals";
+
+import "./index.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <CacheProvider>
+      <ChakraProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </ChakraProvider>
+    </CacheProvider>
   </React.StrictMode>,
 );
 
