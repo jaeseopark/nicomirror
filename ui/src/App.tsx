@@ -1,16 +1,22 @@
-import "./App.css";
-import TopNav from "./TopNav";
 import { ReactNode } from "react";
-import { ChakraProvider } from "@chakra-ui/react";
+import styled from "styled-components";
+
+import TopNav from "./TopNav";
+
+import "./App.css";
+
+const PaddedDiv = styled.div`
+  // TopNav has a height of 2em. Apply additional top padding of 2em to make things look balanced.
+  padding: 2em;
+  padding-top: 4em;
+`;
 
 const App = ({ children }: { children?: ReactNode }) => {
   return (
-    <ChakraProvider>
-      <div className="App">
-        <TopNav />
-        <div className="content">{children}</div>
-      </div>
-    </ChakraProvider>
+    <div className="App">
+      <TopNav />
+      <PaddedDiv>{children}</PaddedDiv>
+    </div>
   );
 };
 

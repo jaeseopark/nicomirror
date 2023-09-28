@@ -1,14 +1,20 @@
-import "./TopNav.scss";
+import { Link as ChakraLink } from "@chakra-ui/react";
+import { Link as ReactRouterLink } from "react-router-dom";
+
 import Search from "./Search";
-import { useNav } from "./hooks/useNav";
+
+import "./TopNav.scss";
 
 const TopNav = () => {
-  const { navRoot, navDownloads } = useNav();
   return (
     <div className="nav">
-      <label onClick={navRoot}>Home</label>
+      <ChakraLink as={ReactRouterLink} to="/">
+        Home
+      </ChakraLink>
       <Search />
-      <label onClick={navDownloads}>Downloads</label>
+      <ChakraLink as={ReactRouterLink} to="/downloads">
+        Downloads
+      </ChakraLink>
     </div>
   );
 };

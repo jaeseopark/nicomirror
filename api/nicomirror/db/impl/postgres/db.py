@@ -6,7 +6,7 @@ import backoff
 from nicoclient.model.playlist import Playlist
 from nicoclient.model.uploader import Uploader
 from nicoclient.model.video import Video
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
@@ -94,8 +94,8 @@ class PostgresDatabase(Database):
             session.commit()
 
     def save_videos(self, videos: List[Video]):
-        videos_dto = [convert(video, to=VideoDto) for video in videos]
         with Session(self.engine) as session:
+            videos_dto = [convert(video, to=VideoDto) for video in videos]
             session.execute(get_upsert_statement(videos_dto).on_conflict_do_nothing())
             session.commit()
 
@@ -103,4 +103,10 @@ class PostgresDatabase(Database):
         with Session(self.engine) as session:
             session.execute(insert(UploaderDto).values(id=uploader_id).on_conflict_do_nothing())
             session.execute(insert(video_to_uploader_table).values(video_id=video_id, uploader_id=uploader_id).on_conflict_do_nothing())
+            session.commit()
+
+    def assign_parent(self, video_id: str, parent_video_id: str):
+        stmt = update(VideoDto).where(VideoDto.id == video_id).values(parent_video_id=parent_video_id)
+        with Session(self.engine) as session:
+            session.execute(stmt)
             session.commit()

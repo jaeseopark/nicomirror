@@ -19,18 +19,17 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# TODO: env var customization
 uvicorn main:app --reload
 ```
 
 ## Code Formatting (Typescript)
 
 ```bash
-npx prettier --write .
-docker-compose -f docker-compose-dev.yml exec ui npx prettier --write .
+npx prettier --write . # If running natively
+docker-compose -f docker-compose-dev.yml exec ui npx prettier --write . # In Docker
 ```
 
 ## Swagger
 
-http://localhost:8000/docs
-http://localhost:8000/redoc
+* http://localhost:8000/docs
+* http://localhost:8000/redoc (Alternative theme)
